@@ -1,0 +1,4 @@
+.venv/
+app/__pycache__
+app/static/scripts-old.js
+app/templates/template.html

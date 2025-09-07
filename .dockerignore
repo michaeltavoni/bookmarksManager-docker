@@ -1,0 +1,5 @@
+app-config/
+dockerfile
+docker-compose.yml
+.venv
+.gitignore
