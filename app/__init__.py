@@ -1,5 +1,5 @@
 from flask import Flask, render_template, jsonify
-import json
+import json, os
 
 app = Flask(__name__)
 
@@ -7,9 +7,13 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/dbConnection')
+@app.route('/db-connection')
 def dbConnection():
-    return render_template('dbConnection.html')
+    return render_template('db-connection.html')
+
+@app.route('/settings')
+def settingsPage():
+    return render_template('settings.html')
 
 @app.route('/getBookmarks')
 def getConfig():

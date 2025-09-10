@@ -1,7 +1,10 @@
 // init ///////////////////////////////////
-const bookmarksTable = document.getElementById('linkTable');
+let bookmarksTable = null;
+let username = localStorage.getItem('bookmarks-username');
+console.log(`Utente: ${username}`);
+const usernameInput = document.getElementById('username');
+const pageIndex = document.body.id
 let bookmarks = null;
-let urlNumber = 0;
 
 // event listener ////////////////////////
 document.addEventListener('DOMContentLoaded', pageInit);
@@ -9,9 +12,43 @@ document.addEventListener('DOMContentLoaded', pageInit);
 // functions ////////////////////////////
 // init
 async function pageInit() {
-    await getBookmarks();
-    paginateBookmarks();
+    if (pageIndex === 'index') {
+        bookmarksTable = document.getElementById('linkTable');
+        defualtUser();
+        await getBookmarks();
+        paginateBookmarks();
+    } else if (pageIndex === 'settings') {
+        defualtUser();
+        usernameInput.value = username;
+    } else if (pageIndex === 'db-connection') {
+        defualtUser();
+    }
 };
+
+// get username
+function defualtUser() {
+    if (!username) {
+        username = 'UTENTE';
+        localStorage.setItem('bookmarks-username', username);
+    };
+}
+
+// set username
+function changeUsername() {
+    if (usernameInput.value!=username) {
+        console.log(`Cambiato username da: ${username} a ${usernameInput.value}`)
+        username = usernameInput.value;
+        localStorage.setItem('bookmarks-username', username);
+        pageInit()
+    }
+}
+
+// remove username
+function removeUsername() {
+    username = null;
+    localStorage.removeItem('bookmarks-username');
+    pageInit();
+}
 
 // get bookmarks
 async function getBookmarks() {
@@ -53,7 +90,6 @@ function paginateBookmarks() {
                         paginateSubsection(content, sectionDiv);
                     } 
                 });
-                urlNumber = 0;
             }
         })
     }
@@ -78,12 +114,10 @@ function paginateUrls(c, s) {
     urlA.id = c.id;
     urlA.textContent = c.label;
     urlA.target = '_blank';
-    urlA.href = c.url;
+    urlA.href = c.url.replace('{username}', username);
 
     urlUl.appendChild(urlLi);
     urlLi.appendChild(urlA);
-
-    urlNumber += 1;
 };
 
 //
@@ -104,10 +138,19 @@ function paginateSubsection(c, s) {
 
     const subSectionData = c.contents
     subSectionData.forEach(subContent => {
-        console.log(subContent)
         if (subContent.type === 'url') {
             paginateUrls(subContent, subSectionDiv);
         }
     })
-    urlNumber = 0;
+};
+
+// menu-bar
+function openSettings() {
+    menuBarDiv = document.getElementsByClassName('menu')[0];
+
+    if (menuBarDiv.style.display === 'flex') {
+        menuBarDiv.style.display = 'none';
+    } else {
+        menuBarDiv.style.display = 'flex';
+    }
 };

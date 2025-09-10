@@ -7,16 +7,16 @@
     <link rel="icon" type="image/x-icon" href="../static/assets/bookmark.png">
 </head>
 
-<body id="index">
+<body id="db-connection">
     <nav>
         <div class="header">
             <div>
                 <h2><a href="/">Bookmarks</a></h2>
             </div>
-            <div class="search-box">
+            <!-- <div class="search-box">
                 <input id="searchText" type="text" onkeyup="searchFunction()" placeholder="Inserisci..." />
                 <button onclick="getConfig()">cerca</button>
-            </div>
+            </div> -->
         </div>
         <div class="menu-button">
             <a onclick="openSettings()"><img src="../static/assets/menu.png"></a>
@@ -30,15 +30,17 @@
             <button onclick="window.open('/settings', '_self')">settings</button>
         </div> 
     </div>
-    <div class="bookmarks">
-        <div id="bannerNoBookmarks">
-            <b>ATTENZIONE!</b><br>
-            Non sono stati trovati dei segnalibri in memoria, occorre caricare un file o inserire manualmente i segnalibri.
-        </div>
-        <table id="linkTable">
+    <div class="db-connection">
+        <table>
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Ambiente</th>
+                    <th>URL</th>
+                </tr>
+            </thead>
         </table>
     </div>
-    <input id="input" type="file" accept=".json"/>
     <script src="../static/scripts.js"></script>
 </body>
 

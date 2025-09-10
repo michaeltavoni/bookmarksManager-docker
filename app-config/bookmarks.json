@@ -10,7 +10,7 @@
                     "id": "PS64",
                     "type": "url",
                     "label": "Picking-server",
-                    "url": "http://www.google.com"
+                    "url": "http://www.google.com/utente={username}"
                 },
                 {
                     "id": "SVIL",
