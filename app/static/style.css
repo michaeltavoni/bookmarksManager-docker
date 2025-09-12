@@ -113,7 +113,7 @@ h2 a:hover {
 }
 .bookmarks {
     max-width: 100%;
-    max-height: calc(100% - 20%);
+    max-height: calc(100% - 15%);
     width: 100%;
     overflow-y: auto;
 }
@@ -166,4 +166,46 @@ tr:nth-child(even) {
     padding: 2px;
     background-color: #ffe6e6;
     border: 1px solid red;
+}
+#dbconnection-table-head, #dbconnection-table-body {
+    table-layout: fixed;
+}
+#dbconnection-table-head th {
+    height: 35px;
+    background-color: var(--headerBackgroundColor);
+}
+/* .db-connection {
+    max-width: 100%;
+    max-height: calc(100% - 15%);
+    width: 100%;
+    overflow-y: auto;
+} */
+ .db-connection {
+  max-height: calc(100% - 80px);
+  overflow-y: auto;
+}
+
+#dbconnection-table-head {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#dbconnection-table-head th {
+  position: sticky;
+  top: 0;
+  background-color: var(--headerBackgroundColor);
+  z-index: 2;
+}
+
+#dbconnection-table-body {
+  display: block;
+  overflow-y: auto;
+  max-height: 100%;
+  width: 100%;
+}
+
+#dbconnection-table-body tr {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
 }

@@ -4,7 +4,7 @@ let username = localStorage.getItem('bookmarks-username');
 console.log(`Utente: ${username}`);
 const usernameInput = document.getElementById('username');
 const pageIndex = document.body.id
-let bookmarks = null;
+let bookmarksJson = null;
 
 // event listener ////////////////////////
 document.addEventListener('DOMContentLoaded', pageInit);
@@ -22,6 +22,8 @@ async function pageInit() {
         usernameInput.value = username;
     } else if (pageIndex === 'db-connection') {
         defualtUser();
+        await getBookmarks();
+        paginateDbConnection();
     }
 };
 
@@ -54,12 +56,12 @@ function removeUsername() {
 async function getBookmarks() {
     const response = await fetch('/getBookmarks');
     const data = await response.json();
-    bookmarks = data;
+    bookmarksJson = data;
 };
 
 // paginate table
 function paginateBookmarks() {
-    const bookmarksData = bookmarks.data;
+    const bookmarksData = bookmarksJson.bookmarks;
 
     if(bookmarksData) {
         bookmarksData.forEach(sectionData => {
@@ -142,6 +144,34 @@ function paginateSubsection(c, s) {
             paginateUrls(subContent, subSectionDiv);
         }
     })
+};
+
+// DB CONNECTION - paginate table
+function paginateDbConnection () {
+    const dbConnectionS = bookmarksJson['database-connection'];
+    const tableDb = document.getElementById('dbconnection-table-body');
+    const tbodyDb = document.createElement('tbody');
+    tableDb.appendChild(tbodyDb);
+
+    dbConnectionS.forEach(dbConnection => {
+        const tdOrder = {
+            0: 'customer',
+            1: 'environment',
+            2: 'username',
+            3: 'password',
+            4: 'url',
+            5: 'notes'
+        }
+        const trDb = document.createElement('tr');
+        tbodyDb.appendChild(trDb);
+
+        for (let i = 0; i <= 5; i++) {
+            let tdDb = document.createElement('td');
+            tdDb.textContent = dbConnection[tdOrder[i]];
+            tdDb.id = tdOrder[i];
+            trDb.appendChild(tdDb);
+        }
+    });
 };
 
 // menu-bar
