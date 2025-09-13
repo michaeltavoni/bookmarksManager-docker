@@ -65,6 +65,7 @@ function paginateBookmarks() {
 
     if(bookmarksData) {
         bookmarksData.forEach(sectionData => {
+            let searchPattern = null;
             if(sectionData.type === 'section') {
                 const sectionTr = document.createElement('tr');
                 const sectionTd = document.createElement('td');
@@ -77,6 +78,9 @@ function paginateBookmarks() {
 
                 titleH3.textContent = sectionData.label;
                 titleH3.id = sectionData.id;
+                idSearch = stripText(sectionData.id);
+                labelSearch = stripText(sectionData.label);
+
 
                 bookmarksTable.appendChild(sectionTr);
                 sectionTr.appendChild(sectionTd);
@@ -87,9 +91,9 @@ function paginateBookmarks() {
                 const contentsData = sectionData.contents;
                 contentsData.forEach(content => {
                     if(content.type === 'url') {
-                        paginateUrls(content, sectionDiv);
+                        paginateUrls(content, sectionDiv, idSearch, labelSearch);
                     } else if(content.type === 'subsection') {
-                        paginateSubsection(content, sectionDiv);
+                        paginateSubsection(content, sectionDiv, idSearch, labelSearch);
                     } 
                 });
             }
@@ -97,8 +101,12 @@ function paginateBookmarks() {
     }
 };
 
+function stripText(t) {
+    return t.toLowerCase().replace(/\s+/g, "");
+};
+
 //
-function paginateUrls(c, s) {
+function paginateUrls(c, s, idS, labS) {
     let urlLi = document.createElement('li');
     let urlA = document.createElement('a');
     let urlUl = s.querySelector('ul');
@@ -112,8 +120,10 @@ function paginateUrls(c, s) {
         s.appendChild(itemDiv);
         itemDiv.appendChild(urlUl);
     }
-
-    urlA.id = c.id;
+    idS = idS+'-'+stripText(c.id);
+    labS = labS+'-'+stripText(c.label);
+    urlA.setAttribute('search-pattern', idS+'-'+labS);
+    urlA.id = idS;
     urlA.textContent = c.label;
     urlA.target = '_blank';
     urlA.href = c.url.replace('{username}', username);
@@ -123,7 +133,7 @@ function paginateUrls(c, s) {
 };
 
 //
-function paginateSubsection(c, s) {
+function paginateSubsection(c, s, idS, labS) {
     const subSectionDiv = document.createElement('div');
     const titleH4Div = document.createElement('div');
     const titleH4 = document.createElement('h4');
@@ -131,8 +141,10 @@ function paginateSubsection(c, s) {
     subSectionDiv.classList.add('bookmarks-subsection');
     titleH4Div.classList.add('title');
 
+    idS = idS+'-'+stripText(c.id);
+    labS = labS+'-'+stripText(c.label);
     titleH4.textContent = c.label;
-    titleH4.id = c.id;
+    titleH4.id = idS;
 
     s.appendChild(subSectionDiv);
     subSectionDiv.appendChild(titleH4Div);
@@ -141,7 +153,7 @@ function paginateSubsection(c, s) {
     const subSectionData = c.contents
     subSectionData.forEach(subContent => {
         if (subContent.type === 'url') {
-            paginateUrls(subContent, subSectionDiv);
+            paginateUrls(subContent, subSectionDiv, idS, labS);
         }
     })
 };
@@ -149,9 +161,7 @@ function paginateSubsection(c, s) {
 // DB CONNECTION - paginate table
 function paginateDbConnection () {
     const dbConnectionS = bookmarksJson['database-connection'];
-    const tableDb = document.getElementById('dbconnection-table-body');
-    const tbodyDb = document.createElement('tbody');
-    tableDb.appendChild(tbodyDb);
+    const tbodyDb = document.getElementById('dbconnection-table-body');
 
     dbConnectionS.forEach(dbConnection => {
         const tdOrder = {
@@ -184,3 +194,29 @@ function openSettings() {
         menuBarDiv.style.display = 'flex';
     }
 };
+
+// BOOKMARKS - search function
+function searchFunctionIndex () {
+    const urlList = document.querySelectorAll('a');
+    const text = document.getElementById('searchText');
+    const textToSearch = stripText(text.value);
+
+    urlList.forEach(url => {
+        let link = url.getAttribute('search-pattern');
+        let linkButton = url.closest('li');
+        const sections = document.querySelectorAll('#linkTable .bookmarks-section, #linkTable .bookmarks-subsection');
+
+        if (link) {
+            if (link.includes(textToSearch)) {
+                linkButton.style.display = '';
+            } else {
+                linkButton.style.display = 'none';
+            }
+        }
+
+        sections.forEach(section => {
+            const visibleLinks = section.querySelectorAll("li:not([style*='display: none'])");
+            section.style.display = visibleLinks.length > 0 ? "" : "none";
+        })
+    })
+}
