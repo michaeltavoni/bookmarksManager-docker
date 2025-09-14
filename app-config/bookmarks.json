@@ -100,15 +100,15 @@
     ],
     "database-connection": [
         {
-            "customer": "Test",
+            "customer": "Alpha",
             "environment": "SVIL",
             "username": "admin",
             "password": "123456",
             "url": "http://www.google.com",
-            "notes": ""
+            "notes": "PPEWeb"
         },
         {
-            "customer": "Test",
+            "customer": "Alpha",
             "environment": "SIT",
             "username": "admin",
             "password": "123456",
@@ -116,7 +116,31 @@
             "notes": ""
         },
         {
-            "customer": "Test",
+            "customer": "Alpha",
+            "environment": "PREPROD",
+            "username": "admin",
+            "password": "123456",
+            "url": "http://www.google.com",
+            "notes": ""
+        },
+        {
+            "customer": "Beta",
+            "environment": "SVIL",
+            "username": "admin",
+            "password": "123456",
+            "url": "http://www.google.com",
+            "notes": "PPEWeb"
+        },
+        {
+            "customer": "Beta",
+            "environment": "SIT",
+            "username": "admin",
+            "password": "123456",
+            "url": "http://www.google.com",
+            "notes": ""
+        },
+        {
+            "customer": "Beta",
             "environment": "PREPROD",
             "username": "admin",
             "password": "123456",

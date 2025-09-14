@@ -10,7 +10,7 @@ let bookmarksJson = null;
 document.addEventListener('DOMContentLoaded', pageInit);
 
 // functions ////////////////////////////
-// init
+// ALL - init pages
 async function pageInit() {
     if (pageIndex === 'index') {
         bookmarksTable = document.getElementById('linkTable');
@@ -18,6 +18,7 @@ async function pageInit() {
         await getBookmarks();
         paginateBookmarks();
     } else if (pageIndex === 'settings') {
+        await getBookmarks();
         defualtUser();
         usernameInput.value = username;
     } else if (pageIndex === 'db-connection') {
@@ -27,7 +28,7 @@ async function pageInit() {
     }
 };
 
-// get username
+// SETTINGS - get user
 function defualtUser() {
     if (!username) {
         username = 'UTENTE';
@@ -35,7 +36,7 @@ function defualtUser() {
     };
 }
 
-// set username
+// SETTINGS - set user
 function changeUsername() {
     if (usernameInput.value!=username) {
         console.log(`Cambiato username da: ${username} a ${usernameInput.value}`)
@@ -45,21 +46,21 @@ function changeUsername() {
     }
 }
 
-// remove username
+// SETTINGS - remove user
 function removeUsername() {
     username = null;
     localStorage.removeItem('bookmarks-username');
     pageInit();
 }
 
-// get bookmarks
+// ALL - get bookmarks.json
 async function getBookmarks() {
     const response = await fetch('/getBookmarks');
     const data = await response.json();
     bookmarksJson = data;
 };
 
-// paginate table
+// BOOKMARKS - paginate bookmarks (section)
 function paginateBookmarks() {
     const bookmarksData = bookmarksJson.bookmarks;
 
@@ -101,11 +102,12 @@ function paginateBookmarks() {
     }
 };
 
+// ALL - strip text
 function stripText(t) {
     return t.toLowerCase().replace(/\s+/g, "");
 };
 
-//
+// BOOKMARKS - paginate bookmarks (url)
 function paginateUrls(c, s, idS, labS) {
     let urlLi = document.createElement('li');
     let urlA = document.createElement('a');
@@ -132,7 +134,7 @@ function paginateUrls(c, s, idS, labS) {
     urlLi.appendChild(urlA);
 };
 
-//
+// BOOKMARKS - paginate bookmarks (subsection)
 function paginateSubsection(c, s, idS, labS) {
     const subSectionDiv = document.createElement('div');
     const titleH4Div = document.createElement('div');
@@ -164,6 +166,12 @@ function paginateDbConnection () {
     const tbodyDb = document.getElementById('dbconnection-table-body');
 
     dbConnectionS.forEach(dbConnection => {
+        let idSearch = stripText(dbConnection['customer']+'-'+dbConnection['environment']);
+
+        if (dbConnection['notes']) {
+            idSearch = idSearch+'-'+stripText(dbConnection['notes']);
+        }
+
         const tdOrder = {
             0: 'customer',
             1: 'environment',
@@ -181,10 +189,11 @@ function paginateDbConnection () {
             tdDb.id = tdOrder[i];
             trDb.appendChild(tdDb);
         }
+        trDb.setAttribute('search-pattern', idSearch);
     });
 };
 
-// menu-bar
+// ALL - menubar
 function openSettings() {
     menuBarDiv = document.getElementsByClassName('menu')[0];
 
@@ -219,4 +228,68 @@ function searchFunctionIndex () {
             section.style.display = visibleLinks.length > 0 ? "" : "none";
         })
     })
+}
+
+// DB-CONNECTION - search function
+function searchFunctionDbConnection() {
+    let trElements = document.querySelectorAll('tr');
+    let text = document.getElementById('searchText');
+    let textToSearch = stripText(text.value);
+
+    trElements.forEach(trElement => {
+        let searchPattern = trElement.getAttribute('search-pattern');
+        if (searchPattern) {
+            if (searchPattern.includes(textToSearch)) {
+                trElement.style.display = '';
+            } else {
+                trElement.style.display = 'none';
+            }
+        }
+    })
+    
+};
+
+// SETTINGS - export bookmarks
+function exportBookmarks() {
+    let data = bookmarksJson;
+    
+    function buildContents(items) {
+        let html = "";
+        items.forEach(item => {
+            if (item.type === "section" || item.type === "subsection") {
+                html += `
+                <DT><H3 ADD_DATE="1650000000" LAST_MODIFIED="1650000000">${item.label}</H3>
+                <DL><p>
+                ${buildContents(item.contents || [])}
+                </DL><p>
+                `;
+            } else if (item.type === "url") {
+                html += `
+                <DT><A HREF="${item.url}" ADD_DATE="1650000100">${item.label}</A>
+                `;
+            }
+        });
+        return html;
+    }
+
+    let contents = buildContents(data.bookmarks);
+
+    let exportTemplate = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+        <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+        <TITLE>Bookmarks</TITLE>
+        <H1>Bookmarks</H1>
+
+        <DL><p>
+        ${contents}
+        </DL><p>`;
+
+    let blob = new Blob([exportTemplate], { type: "text/html" });
+    let url = URL.createObjectURL(blob);
+
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = "bookmarks.html";
+    a.click();
+
+    URL.revokeObjectURL(url);
 }
